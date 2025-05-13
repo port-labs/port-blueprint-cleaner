@@ -90,6 +90,7 @@ port_cleaner/
 │   └── entities.py # Entity management and operations
 ├── utils/          # Utility functions
 │   └── helpers.py  # Helper functions and utilities
+|   └── models.py   # Data models and schemas
 ├── config/         # Configuration management
 │   └── settings.py # Configuration settings and defaults
 └── tests/          # Test files
