@@ -25,13 +25,7 @@ def main():
         integration_type=args.integration_type,
     )
 
-    cleaner = PortBlueprintCleaner(
-        client_id=config.client_id,
-        client_secret=config.client_secret,
-        api_url=config.api_url,
-        integration_identifier=config.integration_identifier,
-        integration_type=config.integration_type,
-    )
+    cleaner = PortBlueprintCleaner(config)
     
     asyncio.run(cleaner.clean(
         from_date=args.from_date,

@@ -1,18 +1,13 @@
 import httpx
 from port_cleaner.core.entities import EntityClientMixin
 from port_cleaner.core.auth import PortAuthentication
+from port_cleaner.config.settings import PortConfig
 
 
 class PortBlueprintCleaner(EntityClientMixin, PortAuthentication):
-    def __init__(self, 
-                    client_id: str,
-                    client_secret: str,
-                    api_url: str,
-                    integration_identifier: str,
-                    integration_type: str,
-        ):
+    def __init__(self, config: PortConfig):
         client = httpx.AsyncClient()
-        auth = PortAuthentication(client, client_id, client_secret, api_url, integration_identifier, integration_type)
+        auth = PortAuthentication(client, config.client_id, config.client_secret, config.api_url, config.integration_identifier, config.integration_type)
         EntityClientMixin.__init__(self, auth, httpx.AsyncClient())
 
     async def clean(self, from_date: str, to_date: str, blueprint_identifiers: list[str]):
