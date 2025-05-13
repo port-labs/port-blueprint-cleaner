@@ -70,8 +70,8 @@ python main.py \
 
 ```bash
 python main.py \
-  --client-id 9BSlAex5gW8JRt6OwB93f7W5fxtiduCF \
-  --client-secret ZEPtwlXHZ1fgRJdDi89NCiaJkpyseY7C3lx5IehjtwN3lbcmN377K9AhCTLut6fD \
+  --client-id 9BSlEex5gW8JRt5OwB03f7W5fxtiduCF \
+  --client-secret ZEUtwlXHZ1ggRJdDi89NCiaJkpyseY7C3lx5IehjtwN4lbcmN377K9AhCTLut6fD \
   --api-url https://api.getport.io/v1 \
   --integration-identifier my-gitlab-integration \
   --integration-type gitlab \
