@@ -1,4 +1,3 @@
-
 import typing
 import aiostream
 from time import time
@@ -15,7 +14,6 @@ def handle_status_code(
         )
     if should_raise:
         response.raise_for_status()
-
 
 
 def get_time(seconds_precision: bool = True) -> float:

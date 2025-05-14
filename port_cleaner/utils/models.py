@@ -1,7 +1,7 @@
-
 from pydantic import BaseModel, Field, PrivateAttr
 from port_cleaner.utils.helpers import get_time
 from typing import Any, TypedDict
+from dataclasses import dataclass, field
 
 RequestOptions = TypedDict(
     "RequestOptions",
@@ -13,6 +13,13 @@ RequestOptions = TypedDict(
     },
 )
 
+
+@dataclass
+class SummaryStats:
+    total_entities: int = 0
+    entities_by_blueprint: dict[str, Any] = field(default_factory=dict)
+    oldest_entity: None | Any = None
+    newest_entity: None | Any = None
 
 
 class TokenResponse(BaseModel):
@@ -28,7 +35,6 @@ class TokenResponse(BaseModel):
     @property
     def full_token(self) -> str:
         return f"{self.token_type} {self.access_token}"
-
 
 
 class Entity(BaseModel):
