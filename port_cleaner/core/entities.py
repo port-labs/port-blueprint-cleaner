@@ -17,9 +17,7 @@ class EntityClientMixin:
     def __init__(self, auth: PortAuthentication, client: httpx.AsyncClient):
         self.auth = auth
         self.client = client
-        self.semaphore = asyncio.Semaphore(
-            PORT_MAX_CONCURRENCY
-        )
+        self.semaphore = asyncio.Semaphore(PORT_MAX_CONCURRENCY)
 
     async def delete_entity(
         self,
@@ -86,38 +84,45 @@ class EntityClientMixin:
         blueprint_identifier: str,
         user_agent_type: str = "exporter",
         rules: List[dict[Any, Any]] | None = None,
-        parameters_to_include: List[str] | None = None,
         limit: int = 100,
     ) -> AsyncIterator[List[Entity]]:
         query = {
             "combinator": "and",
-            "rules": [
-                {
-                    "property": "$datasource",
-                    "operator": "contains",
-                    "value": f"port-ocean/{self.auth.integration_type}/",
-                },
-                {
-                    "property": "$datasource",
-                    "operator": "contains",
-                    "value": f"/{self.auth.integration_identifier}/{user_agent_type}",
-                },
-            ],
+            "rules": (
+                [
+                    {
+                        "property": "$datasource",
+                        "operator": "contains",
+                        "value": f"port-ocean/{self.auth.integration_type}/",
+                    }
+                ]
+                if self.auth.integration_type
+                else []
+            )
+            + (
+                [
+                    {
+                        "property": "$datasource",
+                        "operator": "contains",
+                        "value": f"/{self.auth.integration_identifier}/{user_agent_type}",
+                    }
+                ]
+                if self.auth.integration_identifier
+                else []
+            ),
         }
 
         if rules:
             query["rules"] = query["rules"] + rules
 
-
         page_token = None
         while True:
             logger.info(f"Searching entities with query {query}")
             data = {
-                    "query": query,
-                    **({"from": page_token} if page_token is not None else {}),
-                    "limit": limit,
-                    "include": parameters_to_include or ["blueprint", "identifier"],
-                }
+                "query": query,
+                **({"from": page_token} if page_token is not None else {}),
+                "limit": limit,
+            }
             response = await self.client.post(
                 f"https://api.port.io/v1/blueprints/{blueprint_identifier}/entities/search",
                 json=data,
@@ -125,15 +130,21 @@ class EntityClientMixin:
             )
             handle_status_code(response)
             response_data = response.json()
-            
-            yield [Entity.parse_obj(entity_data) for entity_data in response_data["entities"]]
-                
+
+            yield [
+                Entity.parse_obj(entity_data)
+                for entity_data in response_data["entities"]
+            ]
+
             if not (page_token := response_data.get("next")):
                 break
 
-    
     async def search_entities_updated_at(
-            self, from_date: str, to_date: str, blueprint_identifiers: List[str], user_agent_type: str =  "exporter", 
+        self,
+        from_date: str,
+        to_date: str,
+        blueprint_identifiers: List[str],
+        user_agent_type: str = "exporter",
     ) -> AsyncIterator[Entity]:
         tasks: List[AsyncIterator[list[Entity]]] = []
         for blueprint_identifier in blueprint_identifiers:
@@ -141,17 +152,14 @@ class EntityClientMixin:
                 {
                     "property": "updatedAt",
                     "operator": "notBetween",
-                    "value": {
-                        "from": from_date,
-                        "to": to_date
-                    }
+                    "value": {"from": from_date, "to": to_date},
                 }
             ]
-            tasks.append(self.search_paginated_entities(
-                blueprint_identifier,
-                user_agent_type,
-                search_rules
-            ))
-        
+            tasks.append(
+                self.search_paginated_entities(
+                    blueprint_identifier, user_agent_type, search_rules
+                )
+            )
+
         async for entity in stream_async_iterators_tasks(*tasks):
             yield entity

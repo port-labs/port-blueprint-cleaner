@@ -4,7 +4,7 @@ A Python tool for cleaning Port blueprints by removing entities within a specifi
 
 ## Features
 
-- 🔍 Search and delete entities within a specific date range
+- 🔍 Search and delete entities based on their update timestamps, with optional filtering by integration type and identifier
 - 🔐 Secure authentication with Port.io API
 - ⚡ Asynchronous operations for better performance
 - 🛡️ Configurable deletion options
@@ -44,8 +44,8 @@ The tool requires the following configuration parameters:
 | `client-id` | Your Port.io client ID | Yes |
 | `client-secret` | Your Port.io client secret | Yes |
 | `api-url` | Port.io API URL (default: https://api.getport.io/v1) | No |
-| `integration-identifier` | Your integration identifier | Yes |
-| `integration-type` | Type of integration (e.g., gitlab, github) | Yes |
+| `integration-identifier` | Your integration identifier | No |
+| `integration-type` | Type of integration (e.g., gitlab, github) | No |
 | `from-date` | Start date in ISO format | Yes |
 | `to-date` | End date in ISO format | Yes |
 | `blueprint-identifiers` | List of blueprint identifiers to clean | Yes |

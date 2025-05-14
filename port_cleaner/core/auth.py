@@ -7,6 +7,7 @@ from loguru import logger
 from port_cleaner.utils.helpers import handle_status_code
 from port_cleaner.utils.models import TokenResponse
 
+
 class PortAuthentication:
     def __init__(
         self,
@@ -41,10 +42,7 @@ class PortAuthentication:
         handle_status_code(response)
         return TokenResponse(**response.json())
 
-
-    async def headers(
-        self, user_agent_type: str | None = None
-    ) -> dict[Any, Any]:
+    async def headers(self, user_agent_type: str | None = None) -> dict[Any, Any]:
         return {
             "Authorization": await self.token,
             "User-Agent": user_agent_type,
@@ -61,7 +59,7 @@ class PortAuthentication:
                 self.client_id, self.client_secret
             )
         return self.last_token_object.full_token
-    
+
     @staticmethod
     def _is_personal_token(client_id: str) -> bool:
         email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
